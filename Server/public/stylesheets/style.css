@@ -1,8 +1,18 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-}
-
-a {
-  color: #00B7FF;
-}
+	<style>
+		.con{
+		}
+		.l {
+		width: 50%;
+		height: 100%;
+		background: blue;
+		float: left;
+		text-align: center;
+		}
+		.r {
+		width: 50%;
+		height: 100%;
+		background: green;
+		float: right;
+		text-align: center;
+		}
+	</style>

@@ -3,21 +3,23 @@
  * Module dependencies.
  */
 
+
+var firebase = require('./firebase');//firebase
+
+
 var express = require('express');
 var routes = require('./routes');
 var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
-//Firebase:
-var Firebase = require('firebase');
-var myRootRef = new Firebase('https://myprojectname.firebaseIO-demo.com/');
-myRootRef.set("hello world!");
-///
 
+
+
+var port = 3030;
 var app = express();
 
 // all environments
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || port);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(express.favicon());
