@@ -5,14 +5,14 @@
 	<style>
 		.con{
 		}
-		.l {
+		#l {
 		width: 50%;
 		height: 100%;
 		background: blue;
 		float: left;
 		text-align: center;
 		}
-		.r {
+		#r {
 		width: 50%;
 		height: 100%;
 		background: green;
@@ -25,13 +25,13 @@
 <body>
 
 <div class="con">
-	<div class='r'>
+	<div id='r'>
 		Mizrahit
 
 		<input type="text" id="textbox_r" disabled>
 		<button onclick="myFunction('r')">Click</button>
 	</div>
-	<div class='l'>
+	<div id='l'>
 		Trance
 		<input type="text" id="textbox_l" disabled>
 		<button onclick="myFunction('l')">Click</button>
@@ -42,7 +42,7 @@
 <script type='text/javascript' src='https://cdn.firebase.com/js/client/1.0.17/firebase.js'></script>
 <script type="text/javascript">
 
-var myRootRef = new Firebase('https://Vibeat.firebaseIO-demo.com/');
+
 
 /*
 
@@ -51,10 +51,10 @@ myRootRef.child('vote').on('value', function(snapshot) {
 	});	
 	
 //Writing lists:
-myDataRef.push({name: name, vote: vote});
+myRootRef.push({name: name, vote: vote});
 
 //Reading Data:
-myDataRef.on('child_added', function(snapshot) {
+myRootRef.on('child_added', function(snapshot) {
 	  //We'll fill this in later.
 	});
 	
@@ -67,22 +67,105 @@ myRootRef.set({
 
  */
 
+
+
+ 
+ 
 	
-var elem_r = document.getElementById("textbox_r");
-var elem_l = document.getElementById("textbox_l");
-var num_r = 0;
-var num_l = 0;
+ 
+
+
+//var num_r = 0;
+//var num_l = 0;
+
+function init(){
+	console.log("init!");
+	
+	var count_r;
+	var count_l;
+	var elem_r;
+	var elem_l;
+	
+	var left_dataRef =  new Firebase('https://vibeat.firebaseio-demo.com/Counters/left');
+	left_dataRef.on('value',function(snapshot){
+		 elem_l = document.getElementById("textbox_l");
+		 elem_l.value = snapshot.val();
+		 count_l = parseInt(elem_l.value);
+		 console.log("count_l:" + count_l);
+	
+		var right_dataRef =  new Firebase('https://vibeat.firebaseio-demo.com/Counters/right');
+		right_dataRef.on('value',function(snapshot){
+			elem_r = document.getElementById("textbox_r");
+			elem_r.value = snapshot.val(); 
+			count_r = parseInt(elem_r.value);
+			console.log(((count_l/(count_l+count_r))*100)+'%');
+			document.getElementById("r").style.width = (count_r/(count_l+count_r)*100)+'%';
+			document.getElementById("l").style.width = (count_l/(count_l+count_r)*100)+'%';
+		 });
+		
+	});
+	
+	
+	
+	
+
+	
+}
+
+init();
+//myFunction('r');
+// myFunction('l');
 
 function myFunction(side){
 	console.log("function entered");
+	var count_r;
+	var count_l;
+	
+	var myVotesRef = new Firebase('https://Vibeat.firebaseIO-demo.com/votes');
+	var countersRef = new Firebase('https://vibeat.firebaseio-demo.com/Counters');
+	
+	countersRef.once('value', function(data) {
+		count_l = data.val().left;
+		count_r = data.val().right;
+		document.getElementById("r").style.width = (count_r/(count_l+count_r)*100)+'%';
+		document.getElementById("l").style.width = (count_l/(count_l+count_r)*100)+'%';
+		console.log((count_l/(count_l+count_r)*100)+'%');
+	});
+	
+	//document.getElementById("r").style.width = '70%';
+	
 	if (side == 'l'){
-		myRootRef.push({name: 'user', vote: 'left'});
-		num_l++;
-		elem_l.value = num_l;
-	}else{
-		myRootRef.push({name: 'user', vote: 'right'});
-		num_r++;
-		elem_r.value = num_r;
+		//num_l++;
+		var elem_l = document.getElementById("textbox_l");
+		 var left_dataRef =  new Firebase('https://vibeat.firebaseio-demo.com/Counters/left');
+		 
+		myVotesRef.push({name: 'user', vote: 'left'});
+		//myRootRef.update({Counters:{left : ++elem_l.value}});
+		 //elem_l.value++;
+		 
+		 left_dataRef.on('value',function(snapshot){
+			 console.log(elem_l.value);
+			 elem_l.value = snapshot.val(); 
+		 });
+		 
+		 console.log("Left value is:" + elem_l.value);
+		
+		 countersRef.update({left: ++elem_l.value});//Write
+		
+	}else{		
+		 var elem_r = document.getElementById("textbox_r");
+		var right_dataRef =  new Firebase('https://vibeat.firebaseio-demo.com/Counters/right');
+		//num_r++;
+		//elem_r.value++;
+		myVotesRef.push({name: 'user', vote: 'right'});
+		//myRootRef.update({Counters:{right : ++elem_r.value}});
+		
+		 right_dataRef.on('value',function(snapshot){
+			 elem_r.value = snapshot.val();
+ 		});
+ 
+		 countersRef.update({right: ++elem_r.value});//Write
+		console.log("Right value is:" +elem_r.value);
 	}
 }
 </script>
